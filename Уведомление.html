@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Не пью с незнакомцами</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            transition: background-color 1s, color 1s;
+            font-size: 48px;
+            text-align: center;
+            position: relative;
+        }
+        .overlay {
+            position: fixed;
+            background: white;
+            border: 5px solid red;
+            padding: 40px;
+            text-align: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            font-size: 32px;
+            width: 80%;
+            box-sizing: border-box;
+        }
+        .overlay button {
+            margin: 20px;
+            padding: 20px 40px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 24px;
+            border-radius: 10px;
+        }
+        .btn-yes {
+            background-color: green;
+        }
+        .btn-no {
+            background-color: red;
+        }
+        .error-window {
+            position: fixed;
+            border: 3px solid #000;
+            background-color: #e0e0e0;
+            width: 400px;
+            z-index: 20;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+        }
+        .error-header {
+            background-color: #b00000;
+            color: white;
+            padding: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .error-body {
+            padding: 20px;
+            font-size: 18px;
+            color: black;
+            text-align: center;
+        }
+        .error-btn {
+            padding: 10px 20px;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .timer {
+            font-size: 48px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainText">Не пью с незнакомцами</div>
+
+    <script>
+        setTimeout(() => {
+            document.getElementById('mainText').style.display = 'none';
+            showPopup();
+        }, 1500);
+
+        function showPopup() {
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            overlay.innerHTML = `
+                <p>Хочешь, чтобы я подписалась на тебя в инст?</p>
+                <button class="btn-no" onclick="respond(false)">нет</button>
+                <button class="btn-yes" onclick="respond(true)">да</button>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        function respond(answer) {
+            const overlay = document.querySelector('.overlay');
+            if (answer) {
+                overlay.innerHTML = '<p>тогда удиви</p>';
+            } else {
+                overlay.innerHTML = '<p>Хорошо, я ухожу...</p>';
+            }
+
+            document.body.style.backgroundColor = 'black';
+            document.body.style.color = 'black';
+
+            setTimeout(() => {
+                overlay.remove();
+                showFinalTimer();
+            }, 2000);
+        }
+
+        function showFinalTimer() {
+            const timerDiv = document.createElement('div');
+            timerDiv.className = 'timer';
+            timerDiv.id = 'timer';
+            document.body.appendChild(timerDiv);
+
+            let totalSeconds = 24 * 60 * 60;
+
+            function updateTimer() {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                timerDiv.textContent =
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    setTimeout(updateTimer, 1000);
+                }
+            }
+
+            updateTimer();
+
+            // Через 2 секунды после появления таймера – ошибка
+            setTimeout(() => {
+                spawnErrorWindow();
+            }, 2000);
+        }
+
+        function spawnErrorWindow() {
+            const errorWindow = document.createElement('div');
+            errorWindow.className = 'error-window';
+            errorWindow.innerHTML = `
+                <div class="error-header">Время пошло</div>
+                <div class="error-body">
+                    Нажмите кнопку "ОК".
+                    <br><button class="error-btn" onclick="this.closest('.error-window').remove()">OK</button>
+                </div>
+            `;
+            document.body.appendChild(errorWindow);
+        }
+    </script>
+</body>
+</html>
